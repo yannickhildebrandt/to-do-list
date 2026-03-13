@@ -4,6 +4,16 @@ import {
   addDoc, updateDoc, deleteDoc, doc, serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js';
 
+// ── Firebase Config ──
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCYa9zSpB_BaBuR1_GR9x5kw6SywUW2CD4",
+  authDomain: "to-do-list-a3017.firebaseapp.com",
+  projectId: "to-do-list-a3017",
+  storageBucket: "to-do-list-a3017.firebasestorage.app",
+  messagingSenderId: "65448676063",
+  appId: "1:65448676063:web:1774d5d4df5c97ad96776a"
+};
+
 // ── State ──
 let db = null;
 let app = null;
@@ -46,12 +56,7 @@ currentYear = today.year;
 
 window.addEventListener('DOMContentLoaded', () => {
   updateWeekLabel();
-  const config = localStorage.getItem('wt_firebase_config');
-  if (!config) {
-    openSettings();
-    return;
-  }
-  initFirebase(JSON.parse(config));
+  initFirebase(FIREBASE_CONFIG);
 });
 
 function initFirebase(config) {
