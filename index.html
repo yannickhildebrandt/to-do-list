@@ -14,18 +14,9 @@
         <h2>Einstellungen</h2>
         <button class="btn-icon" onclick="closeSettings()">&times;</button>
       </div>
-      <label for="firebaseConfig">Firebase Config (JSON)</label>
-      <textarea id="firebaseConfig" rows="8" placeholder='{
-  "apiKey": "...",
-  "authDomain": "...",
-  "projectId": "...",
-  "storageBucket": "...",
-  "messagingSenderId": "...",
-  "appId": "..."
-}'></textarea>
       <label for="claudeKey">Claude API Key</label>
       <input type="password" id="claudeKey" placeholder="sk-ant-...">
-      <p class="hint">Firestore-Regeln müssen öffentlichen Lese-/Schreibzugriff erlauben.</p>
+      <p class="hint">Wird für die Spracheingabe benötigt.</p>
       <button class="btn btn-primary" onclick="saveSettings()">Speichern</button>
     </div>
   </div>

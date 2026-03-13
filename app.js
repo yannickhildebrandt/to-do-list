@@ -280,8 +280,6 @@ window.goToCurrentWeek = function () {
 
 // ── Settings ──
 window.openSettings = function () {
-  const config = localStorage.getItem('wt_firebase_config');
-  if (config) document.getElementById('firebaseConfig').value = config;
   const key = localStorage.getItem('wt_claude_api_key');
   if (key) document.getElementById('claudeKey').value = key;
   document.getElementById('settingsModal').classList.add('open');
@@ -292,22 +290,9 @@ window.closeSettings = function () {
 };
 
 window.saveSettings = function () {
-  const configStr = document.getElementById('firebaseConfig').value.trim();
   const key = document.getElementById('claudeKey').value.trim();
-  if (configStr) {
-    try {
-      JSON.parse(configStr);
-      localStorage.setItem('wt_firebase_config', configStr);
-    } catch {
-      alert('Ungültiges JSON für Firebase Config.');
-      return;
-    }
-  }
   if (key) localStorage.setItem('wt_claude_api_key', key);
   closeSettings();
-  if (configStr && !db) {
-    initFirebase(JSON.parse(configStr));
-  }
 };
 
 // ── Add Task Modal ──
