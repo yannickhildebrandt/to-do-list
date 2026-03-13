@@ -63,10 +63,13 @@ function initFirebase(config) {
   try {
     app = initializeApp(config);
     db = getFirestore(app);
-    loadCategories().then(() => loadAndRender());
+    loadCategories().then(() => loadAndRender()).catch(e => {
+      console.error('Firestore load error:', e);
+      alert('Firestore-Fehler: ' + e.message);
+    });
   } catch (e) {
+    console.error('Firebase init error:', e);
     alert('Firebase-Fehler: ' + e.message);
-    openSettings();
   }
 }
 
