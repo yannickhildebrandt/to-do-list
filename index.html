@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Todos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Einstellungen</h2>
+        <button class="btn-icon" onclick="closeSettings()">&times;</button>
+      </div>
+      <label for="firebaseConfig">Firebase Config (JSON)</label>
+      <textarea id="firebaseConfig" rows="8" placeholder='{
+  "apiKey": "...",
+  "authDomain": "...",
+  "projectId": "...",
+  "storageBucket": "...",
+  "messagingSenderId": "...",
+  "appId": "..."
+}'></textarea>
+      <label for="claudeKey">Claude API Key</label>
+      <input type="password" id="claudeKey" placeholder="sk-ant-...">
+      <p class="hint">Firestore-Regeln müssen öffentlichen Lese-/Schreibzugriff erlauben.</p>
+      <button class="btn btn-primary" onclick="saveSettings()">Speichern</button>
+    </div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <div id="addTaskModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Neue Aufgabe</h2>
+        <button class="btn-icon" onclick="closeAddTask()">&times;</button>
+      </div>
+      <label for="taskText">Aufgabe</label>
+      <input type="text" id="taskText" placeholder="Was ist zu tun?">
+
+      <label for="taskCategory">Kategorie</label>
+      <div class="category-select-row">
+        <select id="taskCategory">
+          <option value="">— Keine —</option>
+          <option value="__new__">+ Neue Kategorie</option>
+        </select>
+      </div>
+
+      <div id="newCategoryFields" class="hidden">
+        <label for="newCatName">Kategorie-Name</label>
+        <input type="text" id="newCatName" placeholder="z.B. Kunde X">
+        <label for="newCatColor">Farbe</label>
+        <input type="color" id="newCatColor" value="#4A90D9">
+      </div>
+
+      <label>Priorität</label>
+      <div class="priority-buttons">
+        <button class="btn priority-btn selected" data-priority="high" onclick="selectPriority('high')">
+          <span class="priority-dot priority--high"></span> Hoch
+        </button>
+        <button class="btn priority-btn" data-priority="medium" onclick="selectPriority('medium')">
+          <span class="priority-dot priority--medium"></span> Mittel
+        </button>
+        <button class="btn priority-btn" data-priority="low" onclick="selectPriority('low')">
+          <span class="priority-dot priority--low"></span> Niedrig
+        </button>
+      </div>
+
+      <button class="btn btn-primary" onclick="saveTask()" style="margin-top:1rem">Speichern</button>
+    </div>
+  </div>
+
+  <!-- Voice Confirmation Modal -->
+  <div id="voiceModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Spracheingabe</h2>
+        <button class="btn-icon" onclick="closeVoiceModal()">&times;</button>
+      </div>
+      <p id="voiceTranscript" class="hint"></p>
+      <label for="voiceTaskText">Aufgabe</label>
+      <input type="text" id="voiceTaskText">
+
+      <label for="voiceTaskCategory">Kategorie</label>
+      <div class="category-select-row">
+        <select id="voiceTaskCategory">
+          <option value="">— Keine —</option>
+          <option value="__new__">+ Neue Kategorie</option>
+        </select>
+      </div>
+
+      <div id="voiceNewCategoryFields" class="hidden">
+        <label for="voiceNewCatName">Kategorie-Name</label>
+        <input type="text" id="voiceNewCatName">
+        <label for="voiceNewCatColor">Farbe</label>
+        <input type="color" id="voiceNewCatColor" value="#4A90D9">
+      </div>
+
+      <label>Priorität</label>
+      <div class="priority-buttons" id="voicePriorityButtons">
+        <button class="btn priority-btn" data-priority="high" onclick="selectVoicePriority('high')">
+          <span class="priority-dot priority--high"></span> Hoch
+        </button>
+        <button class="btn priority-btn selected" data-priority="medium" onclick="selectVoicePriority('medium')">
+          <span class="priority-dot priority--medium"></span> Mittel
+        </button>
+        <button class="btn priority-btn" data-priority="low" onclick="selectVoicePriority('low')">
+          <span class="priority-dot priority--low"></span> Niedrig
+        </button>
+      </div>
+
+      <button class="btn btn-primary" onclick="saveVoiceTask()" style="margin-top:1rem">Übernehmen</button>
+    </div>
+  </div>
+
+  <!-- Category Management Modal -->
+  <div id="categoryModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Kategorien verwalten</h2>
+        <button class="btn-icon" onclick="closeCategoryModal()">&times;</button>
+      </div>
+      <div id="categoryList"></div>
+      <div class="new-cat-inline" style="margin-top:1rem">
+        <input type="text" id="mgmtNewCatName" placeholder="Neue Kategorie">
+        <input type="color" id="mgmtNewCatColor" value="#4A90D9">
+        <button class="btn btn-primary btn-sm" onclick="addCategoryFromMgmt()">+</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App -->
+  <header>
+    <button class="btn-icon" onclick="openSettings()" title="Einstellungen">⚙</button>
+    <div class="week-nav">
+      <button class="btn-icon" onclick="prevWeek()">‹</button>
+      <span id="weekLabel">KW 11 / 2026</span>
+      <button class="btn-icon" onclick="nextWeek()">›</button>
+      <button class="btn btn-sm btn-ghost" onclick="goToCurrentWeek()">Heute</button>
+    </div>
+    <button class="btn-icon" onclick="openCategoryModal()" title="Kategorien">⊞</button>
+  </header>
+
+  <main>
+    <div class="action-bar">
+      <button class="btn btn-primary" onclick="openAddTask()">+ Aufgabe</button>
+      <button class="btn btn-mic" id="micBtn" onclick="startVoice()" title="Spracheingabe">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+          <line x1="8" y1="23" x2="16" y2="23"/>
+        </svg>
+      </button>
+    </div>
+    <div id="todoContainer"></div>
+    <div id="emptyState" class="empty-state hidden">
+      <p>Keine Aufgaben für diese Woche.</p>
+    </div>
+  </main>
+
+  <!-- Loading / status overlay -->
+  <div id="statusOverlay" class="status-overlay hidden">
+    <div class="status-box">
+      <div class="spinner"></div>
+      <p id="statusText">Verarbeite...</p>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
