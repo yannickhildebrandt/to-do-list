@@ -546,9 +546,14 @@ window.addCategoryFromMgmt = async function () {
   const name = document.getElementById('mgmtNewCatName').value.trim();
   const color = document.getElementById('mgmtNewCatColor').value;
   if (!name) return;
-  await createCategory(name, color);
-  document.getElementById('mgmtNewCatName').value = '';
-  renderCategoryList();
+  try {
+    await createCategory(name, color);
+    document.getElementById('mgmtNewCatName').value = '';
+    renderCategoryList();
+  } catch (e) {
+    console.error('Category create error:', e);
+    alert('Fehler beim Erstellen: ' + e.message);
+  }
 };
 
 // ── Status overlay ──
